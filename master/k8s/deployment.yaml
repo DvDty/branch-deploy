@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: branch-deploy-master
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: branch-deploy-master
+  template:
+    metadata:
+      labels:
+        app: branch-deploy-master
+    spec:
+      containers:
+        - name: branch-deploy-master
+          image: dvdty/branch-deploy-master:latest
+          ports:
+            - containerPort: 80
