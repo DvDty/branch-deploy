@@ -25,13 +25,16 @@ RUN apt-get update \
        php8.3-ldap \
        php8.3-msgpack php8.3-igbinary php8.3-redis php8.3-swoole \
        php8.3-memcached php8.3-pcov php8.3-imagick php8.3-xdebug \
-    && apt-get install -y kubectl \
     && curl -sLS https://getcomposer.org/installer | php -- --install-dir=/usr/bin/ --filename=composer \
     && apt-get update \
     && apt-get install -y mysql-client \
     && apt-get -y autoremove \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+RUN chmod +x ./kubectl
+RUN mv ./kubectl /usr/local/bin
 
 RUN setcap "cap_net_bind_service=+ep" /usr/bin/php8.3
 
