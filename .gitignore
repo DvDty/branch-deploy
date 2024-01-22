@@ -1,6 +1,9 @@
 .idea/
 
 # Master files
-/master/storage/*.key
 /master/vendor
 /master/.env
+
+# Application files
+/application/vendor
+/application/.env
