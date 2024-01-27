@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: branch-deploy-master
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: branch-deploy-master
@@ -15,5 +15,6 @@ spec:
       containers:
         - name: branch-deploy-master
           image: dvdty/branch-deploy-master:latest
+          imagePullPolicy: "Always"
           ports:
             - containerPort: 80
