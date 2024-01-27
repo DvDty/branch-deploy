@@ -22,7 +22,7 @@ jobs:
           status: ${{ job.status }}
           notify_when: 'failure'
           notification_title: '{workflow} has {status_message}'
-          message_format: ':warning: *{workflow}* {status_message} in <{repo_url}|{repo}>'
+          message_format: ':warning: LEAKED SECRETS in *{workflow}* (<{repo_url}|{repo}>)'
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
