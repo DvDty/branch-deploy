@@ -28,6 +28,9 @@ jobs:
 
   build-check-push-image:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./application
 #    needs: [ security ]
     steps:
       - uses: actions/checkout@v4
@@ -43,6 +46,7 @@ jobs:
         id: build
         with:
           context: "{{defaultContext}}:application"
+          tags: dvdty/branch-deploy-application:${GITHUB_REF##*/}
           load: true
 
       - name: Scan image
@@ -65,4 +69,4 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: true
-          tags: dvdty/branch-deploy-application:${{ github.sha }}
+          tags: dvdty/branch-deploy-application:${GITHUB_REF##*/}
