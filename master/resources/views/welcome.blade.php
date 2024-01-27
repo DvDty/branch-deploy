@@ -36,24 +36,22 @@
 <table>
     <thead>
     <tr>
-        {{-- <th>Branch</th> --}}
-        {{-- <th>Last commit hash</th> --}}
-        <th>Pod Label</th>
-        <th>Image</th>
-        <th>Status</th>
+        <th>Name</th>
+        <th>Branch</th>
+        <th>Lifespan</th>
         <th>Link</th>
         <th>Refresh</th>
     </tr>
     </thead>
     <tbody>
-    @foreach($pods as $pod)
+    @foreach($deployments as $deployment)
         <tr>
-            <td>{{ $pod['podLabel'] }}</td>
-            <td>{{ $pod['image'] }}</td>
-            <td>{{ $pod['status'] }}</td>
-            <td><a href="#">{{ $pod['podIp'] }}</a></td>
+            <td>{{ $deployment['name'] }}</td>
+            <td>{{ $deployment['branch'] }}</td>
+            <td>{{ $deployment['lifespan'] }}</td>
+            <td><a href="#">{{ $deployment['url'] }}</a></td>
             <td>
-                <button onclick="refreshPod('pod-1')">Refresh</button>
+                <button>Refresh</button>
             </td>
         </tr>
     @endforeach
@@ -77,12 +75,5 @@
     <input type="submit" value="Submit">
 </form>
 
-<script>
-    // JavaScript function to refresh a specific pod
-    function refreshPod(podName) {
-        // Add logic to refresh the specific pod (e.g., using AJAX)
-        console.log("Refreshing pod:", podName);
-    }
-</script>
 </body>
 </html>
