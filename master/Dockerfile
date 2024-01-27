@@ -45,11 +45,14 @@ COPY docker/start-container /usr/local/bin/start-container
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY docker/php.ini /etc/php/8.3/cli/conf.d/99-sail.ini
 
+COPY k8s/get-deployments-to-delete.sh /usr/local/bin/get-deployments-to-delete.sh
+
 COPY . .
 
 RUN composer install --no-interaction --no-dev --optimize-autoloader
 
 RUN chmod +x /usr/local/bin/start-container
+RUN chmod +x /usr/local/bin/get-deployments-to-delete.sh
 
 RUN chmod -R 777 storage
 
