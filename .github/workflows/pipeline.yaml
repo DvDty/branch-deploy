@@ -14,3 +14,25 @@ jobs:
       - uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ github.token }}
+
+  notify-on-failure:
+    runs-on: ubuntu-latest
+    needs: [security]
+    if: ${{ always }}
+    steps:
+      - name: Check job status
+        id: check_job_status
+        run: echo "::set-output name=failed_job::${{ job.status == 'failure' ? job.name " '' }}"
+
+      - name: Send custom JSON data to Slack workflow
+        if: steps.check_job_status.outputs.failed_job != ''
+        id: slack
+        uses: slackapi/slack-github-action@v1.25.0
+        with:
+          payload: |
+            {
+              "key": "value",
+              "foo": "bar"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
