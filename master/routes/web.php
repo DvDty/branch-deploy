@@ -1,5 +1,7 @@
 <?php
 
+use App\Github;
+use App\Kubectl;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,6 +15,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+Route::get('/', function (Kubectl $kubectl, Github $github) {
+    return view('welcome', [
+        'pods' => $kubectl->getPods(),
+        'branches' => $github->fetchBranches()->pluck('name'),
+    ]);
 });
