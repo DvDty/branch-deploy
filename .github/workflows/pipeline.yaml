@@ -46,7 +46,7 @@ jobs:
         id: build
         with:
           context: "{{defaultContext}}:application"
-          tags: dvdty/branch-deploy-application:${GITHUB_REF##*/}
+          tags: dvdty/branch-deploy-application:${{ github.head_ref || github.ref_name }}
           load: true
 
       - name: Scan image
@@ -69,4 +69,4 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: true
-          tags: dvdty/branch-deploy-application:${GITHUB_REF##*/}
+          tags: dvdty/branch-deploy-application:${{ github.head_ref || github.ref_name }}
