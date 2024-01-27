@@ -1,0 +1,17 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: delete-expired-deployments
+spec:
+  schedule: "*/1 * * * *"  # Runs every minute
+  jobTemplate:
+    metadata:
+      name: delete-expired-deployments-pod
+    spec:
+      template:
+        spec:
+          containers:
+            - name: delete-expired-deployments
+              image: dvdty/branch-deploy-master:latest
+              command: ["/usr/local/bin/get-deployments-to-delete.sh"]
+          restartPolicy: Never
