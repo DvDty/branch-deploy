@@ -1,0 +1,15 @@
+name: pipeline
+
+on:
+  push:
+    branches: [*]
+
+jobs:
+  security:
+    name: gitleaks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
