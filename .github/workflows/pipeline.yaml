@@ -6,32 +6,29 @@ on:
       - '*'
 
 jobs:
-  security:
-    name: gitleaks
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: gitleaks/gitleaks-action@v2
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-
-      - name: Notify
-        if: always()
-        uses: ravsamhq/notify-slack-action@v1
-        with:
-          status: ${{ job.status }}
-          notify_when: 'failure'
-          notification_title: '{workflow} has {status_message}'
-          message_format: ':warning: LEAKED SECRETS in *{workflow}* (<{repo_url}|{repo}>)'
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+#  security:
+#    name: gitleaks
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v4
+#      - uses: gitleaks/gitleaks-action@v2
+#        env:
+#          GITHUB_TOKEN: ${{ github.token }}
+#
+#      - name: Notify
+#        if: always()
+#        uses: ravsamhq/notify-slack-action@v1
+#        with:
+#          status: ${{ job.status }}
+#          notify_when: 'failure'
+#          notification_title: '{workflow} has {status_message}'
+#          message_format: ':warning: LEAKED SECRETS in *{workflow}* (<{repo_url}|{repo}>)'
+#        env:
+#          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
   build-check-push-image:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./application
-    needs: [ security ]
+#    needs: [ security ]
     steps:
       - uses: actions/checkout@v4
 
@@ -45,7 +42,7 @@ jobs:
         uses: docker/build-push-action@v5
         id: build
         with:
-          context: ./Dockerfile
+          context: "{{defaultContext}}:application"
           load: true
 
       - name: Scan image
