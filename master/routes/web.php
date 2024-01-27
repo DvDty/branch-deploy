@@ -2,6 +2,7 @@
 
 use App\Github;
 use App\Kubectl;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,7 +16,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function (Kubectl $kubectl, Github $github) {
+Route::get('/', function (Request $request, Kubectl $kubectl, Github $github) {
+    if ($request->has('branch') && $request->has('time')) {
+        $kubectl->createInstance($request->has('branch'), (int) $request->has('time'));
+    }
+
     return view('welcome', [
         'pods' => $kubectl->getPods(),
         'branches' => $github->fetchBranches()->pluck('name'),

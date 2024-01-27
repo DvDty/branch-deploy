@@ -27,4 +27,13 @@ class Kubectl
 
         return $pods;
     }
+
+    public function createInstance(string $branch, int $lifespan): void
+    {
+        $createDeploymentCommand = "kubectl create deployment branch-deploy-application-{$branch} --image=dvdty/branch-deploy-application:{$branch}-latest --port=80";
+        $createServiceCommand = "kubectl create service nodeport branch-deploy-application-service-{$branch} --tcp=80:80 -o yaml --dry-run=client | kubectl set selector --local -f - 'app=branch-deploy-application-{$branch}' -o yaml | kubectl create -f -";
+
+        Process::run($createDeploymentCommand);
+        Process::run($createServiceCommand);
+    }
 }
