@@ -1,7 +1,6 @@
 name: pipeline
 
 on:
-  workflow_dispatch:
   push:
     branches:
       - '*'
@@ -64,9 +63,34 @@ jobs:
         with:
           commit_message: Fix code styling
 
-      - name: Cancel current pipeline if push was made
-        if: steps.auto-commit-action.outputs.changes_detected == 'true'
-        run: exit 'New workflow will has started'
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: ./application/vendor
+          key: composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            composer-
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.3
+          tools: composer:v2
+          coverage: none
+
+      - name: Install Project Dependencies
+        working-directory: ./application
+        run: composer install
+
+      - name: Run tests
+        working-directory: ./application
+        run: php artisan test
 
 #  build-check-push-image:
 #    runs-on: ubuntu-latest
