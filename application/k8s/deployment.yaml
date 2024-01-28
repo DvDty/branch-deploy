@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: branch-deploy-application
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: branch-deploy-application
+  template:
+    metadata:
+      labels:
+        app: branch-deploy-application
+    spec:
+      containers:
+        - name: branch-deploy-application
+          image: dvdty/branch-deploy-application:latest
+          imagePullPolicy: "Always"
+          ports:
+            - containerPort: 80
