@@ -2,41 +2,118 @@
 
 namespace App;
 
+use Http\Adapter\Guzzle7\Client as HttpClient;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Process;
+use Illuminate\Support\Str;
+use Maclof\Kubernetes\Client;
+use Maclof\Kubernetes\Models\Deployment;
+use Maclof\Kubernetes\Models\Service;
 
 class Kubectl
 {
     public function getDeployments(): Collection
     {
-        $json = Process::run('kubectl get deployments --output=json')
-            ->throw()
-            ->output();
-
-        $json = json_decode($json, true);
-
         $deployments = collect();
+        $services = collect();
 
-        foreach (data_get($json, 'items', []) as $deployment) {
+        foreach ($this->kubectl()->services()->find()->toArray() as $service) {
+            $service = $service->toArray();
+
+            $services->put(
+                data_get($service, 'metadata.name'),
+                data_get($service, 'spec.ports.0.nodePort'),
+            );
+        }
+
+        foreach ($this->kubectl()->deployments()->find()->toArray() as $deployment) {
+            $deployment = $deployment->toArray();
+
+            if (!Str::startsWith(data_get($deployment, 'metadata.name'), 'branch-deploy-application')) {
+                continue;
+            }
+
             $deployments->push([
                 'name' => data_get($deployment, 'metadata.name'),
                 'branch' => data_get($deployment, 'metadata.annotations.branch'),
                 'lifespan' => data_get($deployment, 'metadata.annotations.lifespan') . ' minutes',
-                'url' => '',
+
+                # Hardcoded cluster IP, need to refactor "NodePort" services to fix :(
+                'url' => 'http://192.168.49.2:' . $services->get(data_get($deployment, 'metadata.name') . 'service'),
             ]);
         }
 
         return $deployments;
     }
 
-    public function createInstance(string $branch, int $lifespan): string
+    public function createInstance(string $branch, string $lifespan): array
     {
-        $createDeploymentCommand = "kubectl create deployment branch-deploy-application-$branch --image=dvdty/branch-deploy-application:$branch --port=80";
-        $applyLifespanCommand = "kubectl annotate deployment branch-deploy-application-$branch lifespan=$lifespan branch=$branch";
-        $createServiceCommand = "kubectl create service nodeport branch-deploy-application-service-$branch --tcp=80:80 -o yaml --dry-run=client | kubectl set selector --local -f - 'app=branch-deploy-application-$branch' -o yaml | kubectl create -f -";
+        $deployment = [
+            'metadata' => [
+                'name' => 'branch-deploy-application-' . $branch,
+                'annotations' => [
+                    'branch' => $branch,
+                    'lifespan' => $lifespan,
+                ],
+            ],
+            'spec' => [
+                'replicas' => 1,
+                'selector' => [
+                    'matchLabels' => [
+                        'app' => 'branch-deploy-application-' . $branch,
+                    ],
+                ],
+                'template' => [
+                    'metadata' => [
+                        'labels' => [
+                            'app' => 'branch-deploy-application-' . $branch,
+                        ],
+                    ],
+                    'spec' => [
+                        'containers' => [
+                            [
+                                'name' => 'branch-deploy-application-' . $branch,
+                                'image' => 'dvdty/branch-deploy-application:' . $branch,
+                                'imagePullPolicy' => 'Always',
+                                'ports' => [
+                                    ['containerPort' => 80],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
 
-        return Process::run($createDeploymentCommand . ' && ' . $applyLifespanCommand . ' && ' . $createServiceCommand)
-            ->throw()
-            ->output();
+        $service = [
+            'metadata' => ['name' => "branch-deploy-application-$branch-service"],
+            'spec' => [
+                'selector' => [
+                    'app' => 'branch-deploy-application-' . $branch,
+                ],
+                'ports' => [
+                    [
+                        'protocol' => 'TCP',
+                        'port' => 80,
+                        'targetPort' => 80,
+                    ],
+                ],
+                'type' => 'NodePort',
+            ],
+        ];
+
+        $this->kubectl()->deployments()->create(new Deployment($deployment));
+        $this->kubectl()->services()->create(new Service($service));
+
+        return [];
+    }
+
+    public function kubectl(): Client
+    {
+        $httpClient = HttpClient::createWithConfig(['verify' => '/var/run/secrets/kubernetes.io/serviceaccount/ca.crt']);
+
+        return new Client([
+            'master' => 'https://10.96.0.1:443',
+            'token' => '/var/run/secrets/kubernetes.io/serviceaccount/token',
+        ], null, $httpClient);
     }
 }
