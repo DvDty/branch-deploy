@@ -52,6 +52,7 @@ jobs:
         run: composer install
 
       - name: Run linter
+        working-directory: ./application
         run: ./application/vendor/bin/php-cs-fixer fix app/
 
       - name: Commit linted files
