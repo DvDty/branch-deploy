@@ -26,78 +26,90 @@ jobs:
 #        env:
 #          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
-  linter:
+#  linter:
+#    runs-on: ubuntu-latest
+#    permissions:
+#      contents: write
+#    steps:
+#      - name: Checkout code
+#        uses: actions/checkout@v4
+#
+#      - name: Cache dependencies
+#        uses: actions/cache@v2
+#        with:
+#          path: ./application/vendor
+#          key: composer-${{ hashFiles('**/composer.lock') }}
+#          restore-keys: |
+#            composer-
+#
+#      - name: Setup PHP
+#        uses: shivammathur/setup-php@v2
+#        with:
+#          php-version: 8.3
+#          tools: composer:v2
+#          coverage: none
+#
+#      - name: Install Project Dependencies
+#        working-directory: ./application
+#        run: composer install
+#
+#      - name: Run linter
+#        working-directory: ./application
+#        run: ./vendor/bin/php-cs-fixer fix app/
+#
+#      - name: Commit linted files
+#        id: auto-commit-action
+#        uses: stefanzweifel/git-auto-commit-action@v5
+#        with:
+#          commit_message: Fix code styling
+#
+#  tests:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout code
+#        uses: actions/checkout@v4
+#
+#      - name: Cache dependencies
+#        uses: actions/cache@v2
+#        with:
+#          path: ./application/vendor
+#          key: composer-${{ hashFiles('**/composer.lock') }}
+#          restore-keys: |
+#            composer-
+#
+#      - name: Setup PHP
+#        uses: shivammathur/setup-php@v2
+#        with:
+#          php-version: 8.3
+#          tools: composer:v2
+#          coverage: none
+#
+#      - name: Install Project Dependencies
+#        working-directory: ./application
+#        run: composer install
+#
+#      - name: Framework configuration
+#        working-directory: ./application
+#        run: |
+#          cp .env.example .env
+#          php artisan key:generate
+#          php artisan config:clear
+#
+#      - name: Run tests
+#        working-directory: ./application
+#        run: php artisan test
+
+  SonarCloud:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Cache dependencies
-        uses: actions/cache@v2
-        with:
-          path: ./application/vendor
-          key: composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            composer-
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 8.3
-          tools: composer:v2
-          coverage: none
-
-      - name: Install Project Dependencies
-        working-directory: ./application
-        run: composer install
-
-      - name: Run linter
-        working-directory: ./application
-        run: ./vendor/bin/php-cs-fixer fix app/
-
-      - name: Commit linted files
-        id: auto-commit-action
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: Fix code styling
-
-  tests:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Cache dependencies
-        uses: actions/cache@v2
-        with:
-          path: ./application/vendor
-          key: composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            composer-
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 8.3
-          tools: composer:v2
-          coverage: none
-
-      - name: Install Project Dependencies
-        working-directory: ./application
-        run: composer install
-
-      - name: Framework configuration
-        working-directory: ./application
-        run: |
-          cp .env.example .env
-          php artisan key:generate
-          php artisan config:clear
-
-      - name: Run tests
-        working-directory: ./application
-        run: php artisan test
+      - name: Analyze
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONARCLOUD_TOKEN }}
 
 #  build-check-push-image:
 #    runs-on: ubuntu-latest
