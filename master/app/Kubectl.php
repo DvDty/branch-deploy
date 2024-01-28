@@ -9,7 +9,9 @@ class Kubectl
 {
     public function getDeployments(): Collection
     {
-        $json = Process::run('kubectl get deployments --output=json')->output();
+        $json = Process::run('kubectl get deployments --output=json')
+            ->throw()
+            ->output();
 
         $json = json_decode($json, true);
 

@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: branch-deploy-application
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: branch-deploy-application
@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: branch-deploy-application
-          image: dvdty/branch-deploy-application:latest
+          image: dvdty/branch-deploy-application:test
           imagePullPolicy: "Always"
           ports:
             - containerPort: 80
