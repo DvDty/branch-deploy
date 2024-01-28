@@ -27,6 +27,7 @@ jobs:
 
   linter:
     runs-on: ubuntu-latest
+    needs: [ security ]
     permissions:
       contents: write
     steps:
@@ -64,6 +65,7 @@ jobs:
 
   tests:
     runs-on: ubuntu-latest
+    needs: [ security ]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -100,6 +102,7 @@ jobs:
 
   static-analysis:
     runs-on: ubuntu-latest
+    needs: [ security ]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -141,6 +144,7 @@ jobs:
 
   database:
     runs-on: ubuntu-latest
+    needs: [ security ]
     services:
       mysql-service:
         image: mysql:8
@@ -204,7 +208,7 @@ jobs:
     defaults:
       run:
         working-directory: ./application
-    needs: [ security ]
+    needs: [ security, linter, tests, static-analysis, SonarCloud, database]
     steps:
       - uses: actions/checkout@v4
 
@@ -232,15 +236,23 @@ jobs:
           vuln-type: 'os,library'
           severity: 'CRITICAL'
 
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Deploy to minikube
+        uses: medyagh/setup-minikube@master
 
-      - name: Push
-        uses: docker/build-push-action@v5
-        with:
-          context: "{{defaultContext}}:application"
-          push: true
-          tags: dvdty/branch-deploy-application:${{ github.head_ref || github.ref_name }}
+      - name: Deploy to minikube
+        working-directory: ./application
+        run:
+          kubectl apply -f k8s/
+
+      - name: Wait for Deployment
+        run: |
+          kubectl rollout status deployment branch-deploy-application
+
+      - name: Expose Service
+        run: |
+          minikube service list
+          curl $(minikube service branch-deploy-application-service --url)  
+
+      - name: Stop Minikube
+        run: |
+          minikube stop

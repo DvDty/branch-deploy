@@ -199,7 +199,9 @@ jobs:
         id: coverage
         working-directory: ./application
         run: |
-          XDEBUG_MODE=coverage php artisan test --coverage |  grep -oP 'Total: \K\d+\.\d+' > code_coverage.txt
+          current_coverage = $(cat code_coverage.txt)
+          floor = $(php -r "echo floor($current_coverage) - 1;")
+          XDEBUG_MODE=coverage php artisan test --coverage --min=$floor |  grep -oP 'Total: \K\d+\.\d+' > code_coverage.txt
 
       - name: Commit code_coverage.txt
         id: auto-commit-action
