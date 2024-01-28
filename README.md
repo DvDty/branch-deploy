@@ -78,4 +78,8 @@ graph TD;
     N --> P
 ```
 
-
+## Starting the control plane
+```
+$ minikube start
+$ kubectl apply -f /master/k8s
+```
