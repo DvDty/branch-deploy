@@ -8,7 +8,7 @@
 
         <style>
             html {
-                background-color: green;
+                background-color: red;
             }
         </style>
     </head>
