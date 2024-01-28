@@ -65,7 +65,7 @@ jobs:
 
       - name: Cancel current pipeline if push was made
         if: steps.auto-commit-action.outputs.changes_detected == 'true'
-        run: exit 'New workflow will has started.'
+        run: exit 'New workflow will has started'
 
 #  build-check-push-image:
 #    runs-on: ubuntu-latest
