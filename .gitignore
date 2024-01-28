@@ -7,3 +7,5 @@
 # Application files
 /application/vendor
 /application/.env
+/application/.php-cs-fixer.cache
+/application/.phpunit.result.cache

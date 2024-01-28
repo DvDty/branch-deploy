@@ -217,7 +217,7 @@ jobs:
     defaults:
       run:
         working-directory: ./application
-    needs: [ security ]
+    needs: [ security , linter, tests, static-analysis, SonarCloud, database ]
     steps:
       - uses: actions/checkout@v4
 
