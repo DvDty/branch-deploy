@@ -99,17 +99,46 @@ jobs:
 #        working-directory: ./application
 #        run: php artisan test
 
-  SonarCloud:
+  static-analysis:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Analyze
-        uses: SonarSource/sonarcloud-github-action@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONARCLOUD_TOKEN }}
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: ./application/vendor
+          key: composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            composer-
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.3
+          tools: composer:v2
+          coverage: none
+
+      - name: Install Project Dependencies
+        working-directory: ./application
+        run: composer install
+
+      - name: Run static analyser
+        working-directory: ./application
+        run: ./vendor/bin/phpstan analyze app/
+
+#  SonarCloud:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout code
+#        uses: actions/checkout@v4
+#
+#      - name: Analyze
+#        uses: SonarSource/sonarcloud-github-action@master
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#          SONAR_TOKEN: ${{ secrets.SONARCLOUD_TOKEN }}
 
 #  build-check-push-image:
 #    runs-on: ubuntu-latest
