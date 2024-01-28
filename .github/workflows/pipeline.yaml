@@ -131,7 +131,7 @@ jobs:
           php artisan key:generate
           php artisan config:clear
 
-      - name: Run tests
+      - name: Run coverage
         working-directory: ./application
         run: php artisan test --coverage
 
@@ -182,8 +182,8 @@ jobs:
       mysql-service:
         image: mysql:8
         env:
-          MYSQL_DATABASE: db
-          MYSQL_USER: admin
+          MYSQL_DATABASE: application
+          MYSQL_USER: root
           MYSQL_ROOT_PASSWORD: password
           MYSQL_PASSWORD: password
         ports:
@@ -220,6 +220,7 @@ jobs:
           php artisan config:clear
 
       - name: Run migrations
+        working-directory: ./application
         run: php artisan migrate
         env:
           DB_PORT: ${{ job.services.mysql-service.ports[3306]}}
@@ -230,6 +231,7 @@ jobs:
         run: php artisan test --testsuite=Feature
 
       - name: Run migrations
+        working-directory: ./application
         run: php artisan migrate:rollback
         env:
           DB_PORT: ${{ job.services.mysql-service.ports[3306]}}
