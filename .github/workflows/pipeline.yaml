@@ -53,7 +53,7 @@ jobs:
 
       - name: Run linter
         working-directory: ./application
-        run: ./application/vendor/bin/php-cs-fixer fix app/
+        run: ./vendor/bin/php-cs-fixer fix app/
 
       - name: Commit linted files
         id: auto-commit-action
