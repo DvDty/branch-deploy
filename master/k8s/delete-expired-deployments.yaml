@@ -13,6 +13,5 @@ spec:
           containers:
             - name: delete-expired-deployments
               image: dvdty/branch-deploy-master:latest
-              command: []
-#              ["/usr/local/bin/get-deployments-to-delete.sh"]
+              command: ["/usr/local/bin/get-deployments-to-delete.sh"]
           restartPolicy: Never
