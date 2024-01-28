@@ -89,6 +89,7 @@ jobs:
         run: composer install
 
       - name: Framework configuration
+        working-directory: ./application
         run: |
           cp .env.example .env
           php artisan key:generate
