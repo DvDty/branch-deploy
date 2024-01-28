@@ -33,6 +33,8 @@ class Kubectl
         $applyLifespanCommand = "kubectl annotate deployment branch-deploy-application-$branch lifespan=$lifespan branch=$branch";
         $createServiceCommand = "kubectl create service nodeport branch-deploy-application-service-$branch --tcp=80:80 -o yaml --dry-run=client | kubectl set selector --local -f - 'app=branch-deploy-application-$branch' -o yaml | kubectl create -f -";
 
-        return Process::run($createDeploymentCommand . ' && ' . $applyLifespanCommand . ' && ' . $createServiceCommand)->throw()->output();
+        return Process::run($createDeploymentCommand . ' && ' . $applyLifespanCommand . ' && ' . $createServiceCommand)
+            ->throw()
+            ->output();
     }
 }
