@@ -38,7 +38,7 @@ class Kubectl
                 'lifespan' => data_get($deployment, 'metadata.annotations.lifespan') . ' minutes',
 
                 # Hardcoded cluster IP, need to refactor "NodePort" services to fix :(
-                'url' => 'http://192.168.49.2:' . $services->get(data_get($deployment, 'metadata.name') . 'service'),
+                'url' => 'http://192.168.49.2:' . $services->get(data_get($deployment, 'metadata.name') . '-service'),
             ]);
         }
 

@@ -49,7 +49,7 @@
             <td>{{ $deployment['name'] }}</td>
             <td>{{ $deployment['branch'] }}</td>
             <td>{{ $deployment['lifespan'] }}</td>
-            <td><a href="#">{{ $deployment['url'] }}</a></td>
+            <td><a href="{{ $deployment['url'] }}   ">{{ $deployment['url'] }}</a></td>
             <td>
                 <button>Refresh</button>
             </td>
