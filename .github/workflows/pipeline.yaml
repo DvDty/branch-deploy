@@ -88,6 +88,12 @@ jobs:
         working-directory: ./application
         run: composer install
 
+      - name: Framework configuration
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+          php artisan config:clear
+
       - name: Run tests
         working-directory: ./application
         run: php artisan test
