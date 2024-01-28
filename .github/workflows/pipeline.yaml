@@ -196,7 +196,7 @@ jobs:
 
       - name: Get test coverage
         working-directory: ./application
-        run: php artisan test --coverage
+        run: XDEBUG_MODE=coverage php artisan test --coverage
 
       - name: Run migrations
         working-directory: ./application
