@@ -33,21 +33,21 @@ Main focus is to provide the development team strong CI:
 
 Example with leaked api key:
 
-![img.png](img.png)
+![img.png](readme/img.png)
 
 Notification in slack:
 
-![img_1.png](img_1.png)
+![img_1.png](readme/img_1.png)
 
 ### Code linter
 
-![img_3.png](img_3.png)
+![img_3.png](readme/img_3.png)
 
-![img_2.png](img_2.png)
+![img_2.png](readme/img_2.png)
 
 ### Code coverage
 
-![img_4.png](img_4.png)
+![img_4.png](readme/img_4.png)
 
 
 ## Control plane

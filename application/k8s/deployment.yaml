@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: branch-deploy-application
-          image: dvdty/branch-deploy-application:test
+          image: dvdty/branch-deploy-application:latest
           imagePullPolicy: "Always"
           ports:
             - containerPort: 80

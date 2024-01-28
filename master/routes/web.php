@@ -17,6 +17,8 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function (Request $request, Kubectl $kubectl, Github $github) {
+    dd($kubectl->getDeployments());
+
     if ($request->has('branch') && $request->has('time')) {
         $kubectl->createInstance($request->input('branch'), (int) $request->input('time'));
     }
