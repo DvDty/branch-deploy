@@ -97,43 +97,7 @@ jobs:
 #
 #      - name: Run tests
 #        working-directory: ./application
-#        run: php artisan test
-
-  code-covarage-decrease:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Cache dependencies
-        uses: actions/cache@v2
-        with:
-          path: ./application/vendor
-          key: composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            composer-
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 8.3
-          tools: composer:v2
-          coverage: xdebug
-
-      - name: Install Project Dependencies
-        working-directory: ./application
-        run: composer install
-
-      - name: Framework configuration
-        working-directory: ./application
-        run: |
-          cp .env.example .env
-          php artisan key:generate
-          php artisan config:clear
-
-      - name: Run coverage
-        working-directory: ./application
-        run: php artisan test --coverage
+#        run: php artisan test --testsuite=Unit
 
 #  static-analysis:
 #    runs-on: ubuntu-latest
@@ -229,6 +193,10 @@ jobs:
       - name: Run feature tests
         working-directory: ./application
         run: php artisan test --testsuite=Feature
+
+      - name: Get test coverage
+        working-directory: ./application
+        run: php artisan test --coverage
 
       - name: Run migrations
         working-directory: ./application
