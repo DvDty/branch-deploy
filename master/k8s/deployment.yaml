@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: branch-deploy-master
-          image: dvdty/branch-deploy-master:latest
+          image: dvdty/branch-deploy-master:main
           imagePullPolicy: "Always"
           ports:
             - containerPort: 80
