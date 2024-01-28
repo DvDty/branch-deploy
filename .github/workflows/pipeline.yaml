@@ -99,8 +99,96 @@ jobs:
 #        working-directory: ./application
 #        run: php artisan test
 
-  static-analysis:
+  code-covarage-decrease:
     runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: ./application/vendor
+          key: composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            composer-
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.3
+          tools: composer:v2
+          coverage: xdebug
+
+      - name: Install Project Dependencies
+        working-directory: ./application
+        run: composer install
+
+      - name: Framework configuration
+        working-directory: ./application
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+          php artisan config:clear
+
+      - name: Run tests
+        working-directory: ./application
+        run: php artisan test --coverage
+
+#  static-analysis:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout code
+#        uses: actions/checkout@v4
+#
+#      - name: Cache dependencies
+#        uses: actions/cache@v2
+#        with:
+#          path: ./application/vendor
+#          key: composer-${{ hashFiles('**/composer.lock') }}
+#          restore-keys: |
+#            composer-
+#
+#      - name: Setup PHP
+#        uses: shivammathur/setup-php@v2
+#        with:
+#          php-version: 8.3
+#          tools: composer:v2
+#          coverage: none
+#
+#      - name: Install Project Dependencies
+#        working-directory: ./application
+#        run: composer install
+#
+#      - name: Run static analyser
+#        working-directory: ./application
+#        run: ./vendor/bin/phpstan analyze app/
+
+#  SonarCloud:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout code
+#        uses: actions/checkout@v4
+#
+#      - name: Analyze
+#        uses: SonarSource/sonarcloud-github-action@master
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#          SONAR_TOKEN: ${{ secrets.SONARCLOUD_TOKEN }}
+
+  database:
+    runs-on: ubuntu-latest
+    services:
+      mysql-service:
+        image: mysql:8
+        env:
+          MYSQL_DATABASE: db
+          MYSQL_USER: admin
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_PASSWORD: password
+        ports:
+          - 3306/tcp
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -124,21 +212,28 @@ jobs:
         working-directory: ./application
         run: composer install
 
-      - name: Run static analyser
+      - name: Framework configuration
         working-directory: ./application
-        run: ./vendor/bin/phpstan analyze app/
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+          php artisan config:clear
 
-#  SonarCloud:
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Checkout code
-#        uses: actions/checkout@v4
-#
-#      - name: Analyze
-#        uses: SonarSource/sonarcloud-github-action@master
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#          SONAR_TOKEN: ${{ secrets.SONARCLOUD_TOKEN }}
+      - name: Run migrations
+        run: php artisan migrate
+        env:
+          DB_PORT: ${{ job.services.mysql-service.ports[3306]}}
+          DB_HOST: 127.0.0.1
+
+      - name: Run feature tests
+        working-directory: ./application
+        run: php artisan test --testsuite=Feature
+
+      - name: Run migrations
+        run: php artisan migrate:rollback
+        env:
+          DB_PORT: ${{ job.services.mysql-service.ports[3306]}}
+          DB_HOST: 127.0.0.1
 
 #  build-check-push-image:
 #    runs-on: ubuntu-latest
