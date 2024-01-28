@@ -8,6 +8,7 @@ kubectl get deployments -o=jsonpath='{range .items[*]}{.metadata.name} {.metadat
 
         if [ "$current_minus_lifespan" -ge "$creation_seconds" ]; then
             kubectl delete deployment "$deployment"
+            kubectl delete service "$deployment"-service
         fi
     fi
 done
